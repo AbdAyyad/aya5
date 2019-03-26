@@ -35,6 +35,10 @@ struct dirent *de;  // Pointer for directory entry
 void str_echo(int sockfd){
      ssize_t n;
      char    buf[MAXLINE];
+     read(sockfd, buf, MAXLINE);
+     puts(buf);
+     read(sockfd, buf, MAXLINE);
+     puts(buf);
 
    
 }
