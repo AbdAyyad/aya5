@@ -36,6 +36,26 @@ void list(int sockfd){
 	puts(recvline);
 }
 
+void upload(int sockfd){
+	char sendline[MAXLINE], recvline[MAXLINE];
+	char * ptr;
+	strcpy(sendline,"upload");
+        //write(sockfd, sendline, strlen (sendline));
+	printf("enter file path: ");
+	scanf("%s",sendline);
+	puts(sendline);	
+	FILE* file = fopen(sendline,"r");
+	ptr = strrchr(sendline, '/');
+	puts(ptr);	
+	strcpy(sendline,ptr+1);
+	puts(sendline);	        
+	//read(sockfd, recvline, MAXLINE);
+	puts(recvline);
+}
+
+void download(int sockfd){
+}
+
 int main(int argc, char **argv){
      int     sockfd;
      struct sockaddr_in servaddr;
@@ -47,11 +67,11 @@ int main(int argc, char **argv){
      servaddr.sin_port = htons(atoi(argv[2]));
      inet_pton(AF_INET, argv[1], &servaddr.sin_addr);
 
-     connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
+     //connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
      int choice;
      while(1){
-        write(sockfd, argv[3], strlen (argv[3]));        
+        //write(sockfd, argv[3], strlen (argv[3]));        
 	show_menue();
 	scanf("%d",&choice);
         switch(choice){
@@ -59,9 +79,11 @@ int main(int argc, char **argv){
                 list(sockfd);
   		break;
            case 2:
-	   break;
+		upload(sockfd);
+	   	break;
 	   case 3:
-	   break;
+		download(sockfd);
+	   	break;
 	   case 4:
 		exit(0);
 	        break;
