@@ -22,6 +22,7 @@ void list(int sockfd){
 	strcpy(sendline,"list");
         write(sockfd, sendline, strlen (sendline));
         read(sockfd, recvline, MAXLINE);
+	puts("list of files:");
 	puts(recvline);
 }
 
@@ -84,9 +85,10 @@ int main(int argc, char **argv){
      connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
      int choice;
+     write(sockfd, argv[3], strlen (argv[3]));        
+	
      while(1){
-        write(sockfd, argv[3], strlen (argv[3]));        
-	show_menue();
+        show_menue();
 	scanf("%d",&choice);
         switch(choice){
            case 1:
