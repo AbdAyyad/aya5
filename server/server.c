@@ -9,7 +9,7 @@
 #include      <arpa/inet.h>
 
 #define MAXLINE 4096
-
+char cwd[MAXLINE];
 //mkdir("/home/me/test.txt", 0777);
 
 /*
@@ -59,7 +59,8 @@ int main(int argc, char **argv) {
      bind(listenfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
      listen(listenfd, 1024);
-
+     getcwd(cwd, sizeof(cwd));
+     printf("%s",cwd);
      for ( ; ; )  {
          clilen = sizeof(cliaddr);
          connfd = accept(listenfd, (struct sockaddr *) &cliaddr, &clilen);
