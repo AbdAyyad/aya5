@@ -53,6 +53,40 @@ void upload(int sockfd,char*path){
 	}
 }
 
+void download(int sockfd,char*path){
+	char sendline[MAXLINE], recvline[MAXLINE];
+	char filename[MAXLINE];
+
+	bzero(filename,MAXLINE);
+	bzero(sendline,MAXLINE);
+	bzero(recvline,MAXLINE);
+
+	strcpy(filename,path);
+	read(sockfd, recvline, MAXLINE);	
+	strcat(filename,recvline);
+	//printf("recvline %s\n",recvline);
+	//printf("filename %s\n",filename);
+	
+	FILE* file = fopen(filename,"r");	
+	
+	while(fgets(sendline,MAXLINE,file) != NULL){
+                printf("read: %s",sendline);
+		write(sockfd, sendline, strlen (sendline));
+		bzero(sendline,MAXLINE);
+		sync();
+	}
+	printf("read: %s",sendline);
+	bzero(sendline,MAXLINE);
+	bzero(recvline,MAXLINE);
+	strcpy(sendline,"./././././././././././././././././");
+	printf("read: %s",sendline);
+	write(sockfd, sendline, strlen (sendline));
+	//sync();
+	bzero(sendline,MAXLINE);	        
+	read(sockfd, recvline, MAXLINE);
+	puts(recvline);
+}
+
 void str_echo(int sockfd){
      	ssize_t n;
      	char    buf[MAXLINE], usr[MAXLINE], path[MAXLINE];
@@ -76,11 +110,13 @@ void str_echo(int sockfd){
 	bzero(buf,MAXLINE);
 	read(sockfd, buf, MAXLINE);
      	
-	printf("buf %s\n",buf);
+	//printf("buf %s\n",buf);
 	if(strcmp(buf,"list") == 0){
 		list(sockfd,path);	
-	} if(strcmp(buf,"upload") == 0){
+	} else if(strcmp(buf,"upload") == 0){
 		upload(sockfd,path);	
+	} else if(strcmp(buf,"download") == 0){
+		download(sockfd,path);	
 	}
 	   
 }
@@ -90,7 +126,7 @@ int main(int argc, char **argv) {
       pid_t   childpid;
       socklen_t clilen;
       struct sockaddr_in cliaddr, servaddr;
-
+	char path[MAXLINE];
       listenfd = socket (AF_INET, SOCK_STREAM, 0);
 
       bzero(&servaddr, sizeof(servaddr));
@@ -102,6 +138,14 @@ int main(int argc, char **argv) {
 
       listen(listenfd, 1024);
       getcwd(cwd, sizeof(cwd));
+	strcpy(path,cwd);
+	strcat(path,"/files/");
+	DIR *dr = opendir(path);   
+    	if (dr == NULL)  // opendir returns NULL if couldn't open directory 
+   	{ 
+  	        mkdir(path, 0777);
+		closedir(dr);       
+    	}
       //printf("%s",cwd);
       for ( ; ; )  {
           clilen = sizeof(cliaddr);

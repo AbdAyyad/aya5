@@ -63,19 +63,26 @@ void download(int sockfd){
 	char sendline[MAXLINE], recvline[MAXLINE];
 	strcpy(sendline,"download");
         write(sockfd, sendline, strlen (sendline));
-	read(sockfd, recvline, MAXLINE);
+	sync();
+	printf("enter file name: ");
+	scanf("%s",sendline);
+        write(sockfd, sendline, strlen (sendline));
+	sync();		
 	// // // // // // // // // // //
         //    error message           //
 	// // // // // // // // // // // 
 	FILE* file = fopen(sendline,"w");
-	read(sockfd, recvline, MAXLINE);
-	while(fgets(recvline,MAXLINE,file) != NULL){
-		if(strcmp(recvline,"./././././././././././././././././")==0){
-			fclose(file);			
-			break;		
-		}                
-		puts(recvline);
-		fprintf(file,"%s",recvline);
+	
+	while(read(sockfd, recvline, MAXLINE) != 0){
+		printf("buf:%s\n",recvline);
+		if(strcmp(recvline,"./././././././././././././././././") != 0){
+			fprintf(file,"%s",recvline);	
+			fflush(file);	
+		} else {
+			bzero(recvline,MAXLINE);
+			break;
+		}
+		bzero(recvline,MAXLINE);
 	}
 	puts("download complete");
 }
