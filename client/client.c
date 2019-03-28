@@ -31,21 +31,30 @@ void upload(int sockfd){
 	char * ptr;
 	strcpy(sendline,"upload");
         write(sockfd, sendline, strlen (sendline));
+	sync();
 	printf("enter file path: ");
 	scanf("%s",sendline);
-	//puts(sendline);	
+	//puts(sendline);
+	fflush(stdout);	
 	FILE* file = fopen(sendline,"r");
 	ptr = strrchr(sendline, '/');
 	//puts(ptr);	
 	strcpy(sendline,ptr+1);
-	puts(sendline);
+	//puts(sendline);
         write(sockfd, sendline, strlen (sendline));
+ 	sync();
 	while(fgets(sendline,MAXLINE,file) != NULL){
-                //puts(sendline);
+                printf("read: %s",sendline);
 		write(sockfd, sendline, strlen (sendline));
+		bzero(sendline,MAXLINE);
+		sync();
 	}
+	bzero(sendline,MAXLINE);
+	bzero(recvline,MAXLINE);
 	strcpy(sendline,"./././././././././././././././././");
-	write(sockfd, sendline, strlen (sendline));	        
+	write(sockfd, sendline, strlen (sendline));
+	//sync();
+	bzero(sendline,MAXLINE);	        
 	read(sockfd, recvline, MAXLINE);
 	puts(recvline);
 }
@@ -61,7 +70,7 @@ void download(int sockfd){
 	FILE* file = fopen(sendline,"w");
 	read(sockfd, recvline, MAXLINE);
 	while(fgets(recvline,MAXLINE,file) != NULL){
-		if(strcmp(recvline,"./././././././././././././././././")){
+		if(strcmp(recvline,"./././././././././././././././././")==0){
 			fclose(file);			
 			break;		
 		}                
@@ -72,23 +81,22 @@ void download(int sockfd){
 }
 
 int main(int argc, char **argv){
-     int     sockfd;
-     struct sockaddr_in servaddr;
-
-     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-     bzero(&servaddr, sizeof(servaddr));
-     servaddr.sin_family = AF_INET;
-     servaddr.sin_port = htons(atoi(argv[2]));
-     inet_pton(AF_INET, argv[1], &servaddr.sin_addr);
-
-     connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
-
-     int choice;
-     write(sockfd, argv[3], strlen (argv[3]));        
+     	int     sockfd;
+     	struct sockaddr_in servaddr;
+	int choice;
+             
 	
      while(1){
-        show_menue();
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+     	bzero(&servaddr, sizeof(servaddr));
+     	servaddr.sin_family = AF_INET;
+     	servaddr.sin_port = htons(atoi(argv[2]));
+     	inet_pton(AF_INET, argv[1], &servaddr.sin_addr);
+	int n = connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
+	//printf("n %d\n",n);
+	write(sockfd, argv[3], strlen (argv[3]));     
+	show_menue();
 	scanf("%d",&choice);
         switch(choice){
            case 1:
@@ -106,5 +114,6 @@ int main(int argc, char **argv){
 	   default :
 		puts("wrong choice");
         }
+	close(sockfd);
      }   
  }
