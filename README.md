@@ -1,3 +1,5 @@
+# my ftp server
+
 to compile the code
 gcc client.c -o client.o
 
