@@ -67,8 +67,19 @@ void download(int sockfd,char*path){
 	//printf("recvline %s\n",recvline);
 	//printf("filename %s\n",filename);
 	
-	FILE* file = fopen(filename,"r");	
-	
+	FILE* file = fopen(filename,"r");
+	// file nout found	
+	if(file == NULL){
+		strcpy(sendline,"file not found");
+		write(sockfd, sendline, strlen (sendline));
+		sync();
+		return;
+	}
+
+	strcpy(sendline,"ok");
+	write(sockfd, sendline, strlen (sendline));	
+	sync();
+
 	while(fgets(sendline,MAXLINE,file) != NULL){
                 printf("read: %s",sendline);
 		write(sockfd, sendline, strlen (sendline));

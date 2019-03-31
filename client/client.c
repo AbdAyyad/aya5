@@ -67,10 +67,15 @@ void download(int sockfd){
 	printf("enter file name: ");
 	scanf("%s",sendline);
         write(sockfd, sendline, strlen (sendline));
-	sync();		
+	sync();
+	read(sockfd, recvline, MAXLINE);		
 	// // // // // // // // // // //
         //    error message           //
-	// // // // // // // // // // // 
+	// // // // // // // // // // //
+	if(strcmp(recvline,"file not found")==0){
+		puts("error file not found in the server");
+		return;
+	} 
 	FILE* file = fopen(sendline,"w");
 	
 	while(read(sockfd, recvline, MAXLINE) != 0){
